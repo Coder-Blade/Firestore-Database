@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firestore</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        #enterDetails {
+            float: left;
+            width: 45%;
+            height: 345px;
+            background-color: #a176e9;
+            color: black;
+            border-radius: 10px;
+        }
+
+        input {
+            width: 120px;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="enterDetails">
+        <label>Class</label>
+        <select id="class">
+            <option value="9thA">9thA</option>
+            <option value="9thB">9thB</option>
+            <option value="9thC">9thC</option>
+            <option value="9thD">9thD</option>
+            <option value="10thA">10thA</option>
+            <option value="10thB">10thB</option>
+            <option value="10thC">10thC</option>
+            <option value="10thD">10thD</option>
+            <option value="10thE">10thE</option>
+            <option value="10thF">10thF</option>
+            <option value="11thA">11thA</option>
+            <option value="11thB">11thB</option>
+            <option value="11thC">11thC</option>
+            <option value="11thD">11thD</option>
+        </select><br><br>
+        <label>Name:</label><br><input type="text" id="Name"><br><br>
+        <label>Student ID:</label><br><input type="text" id="id"><br><br>
+        <label>Roll no:</label><br><input type="text" id="Roll"><br><br>
+
+
+        <div id="btn"><button id="add">Add </button>
+            <button id="update">update </button>
+            <button id="delete">delete </button>
+            <button id="find">Find </button>
+        </div>
+    </div>
+
+
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-analytics.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD6bgLk52L4RL64K6g6M-cqEr7hytM7Mq8",
+            authDomain: "attendance-app-28cd2.firebaseapp.com",
+            databaseURL: "https://attendance-app-28cd2-default-rtdb.firebaseio.com",
+            projectId: "attendance-app-28cd2",
+            storageBucket: "attendance-app-28cd2.appspot.com",
+            messagingSenderId: "1063572994138",
+            appId: "1:1063572994138:web:8a657853aca0ffde894063",
+            measurementId: "G-LK4GTLGL7Q"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore();
+
+        let Name = document.getElementById("Name");
+        let Roll = document.getElementById("Roll");
+        let id = document.getElementById("id");
+        let Class = document.getElementById("class");
+
+
+        let add = document.getElementById("add");
+        let update = document.getElementById("update");
+        let Delete = document.getElementById("delete");
+        let Find = document.getElementById("find");
+
+
+        // -----------------------adding------------------------
+        async function AddDocument_CustomID() {
+            // let ref = collection(db, "Class");
+            // const docRef = await addDoc(
+            let ref = doc(db, `${Class.value}/${"Roll no." + Roll.value}`);
+            await setDoc(
+                ref, {
+                Name: Name.value,
+                Rollno: Roll.value,
+                StudentID: id.value,
+                Class: Class.value
+            }
+            )
+                .then(() => {
+                    alert("Student Details added Successful")
+                })
+                .catch((error) => {
+                    alert("wrong,error:" + error);
+                });
+        }
+
+        // -----------------------Finding------------------------
+
+        async function GetADocument() {
+            let ref = doc(db, `${Class.value}/${"Roll no." + Roll.value}`);
+            const docSnap = await getDoc(ref);
+            if (docSnap.exists()) {
+                Name.value = docSnap.data().Name
+                Roll.value = docSnap.data().Rollno
+                id.value = docSnap.data().StudentID
+                Class.value = docSnap.data().Class
+            }
+            else {
+                alert("Details not found")
+            }
+        }
+
+        // -----------------------updateing------------------------
+
+
+        async function UpdateFieldsInADocument() {
+            let ref = doc(db, `${Class.value}/${"Roll no." + Roll.value}`);
+
+            await updateDoc(
+                ref, {
+                Name: Name.value,
+                Rollno: Roll.value,
+                StudentID: id.value,
+                Class: Class.value
+            }
+            )
+                .then(() => {
+                    alert("Updated Successful")
+                })
+                .catch((error) => {
+                    alert("wrong,error:" + error);
+                });
+        }
+
+        async function DeleteDocument() {
+            let ref = doc(db, `${Class.value}/${"Roll no." + Roll.value}`);
+            const docSnap = await getDoc(ref);
+
+            if (!docSnap.exists()) {
+                alert("Document does not exist");
+                return;
+            }
+            await deleteDoc(ref)
+                .then(() => {
+                    alert("Deleted Successful");
+                })
+
+                .catch((error) => {
+                    alert("wrong,error:" + error);
+                });
+
+        }
+
+
+        add.addEventListener('click', AddDocument_CustomID);
+        Find.addEventListener('click', GetADocument);
+        update.addEventListener('click', UpdateFieldsInADocument);
+        Delete.addEventListener('click', DeleteDocument);
+
+    </script>
+
+
+</body>
+
+</html>
